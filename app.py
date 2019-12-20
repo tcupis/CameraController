@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect
 from forms import LoginForm
 import random
 import json
@@ -14,6 +14,10 @@ camera = cc.CameraController()
 
 @app.route("/", methods=['GET', 'POST'])
 def main():
+    if request.method == 'POST':
+        if request.form['takePhoto'] and camera.getStatus():
+            camera.takePhoto()
+
     return render_template('app.html', title='Camera Controller', status=camera.getStatus())
 
 

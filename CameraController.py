@@ -18,16 +18,8 @@ class CameraController:
         #Intialise LCD and kill gphoto2
         self.LCD = lcd.lcd()
         self.killGphoto2Process()
-        
 
-        #Take photo
-        """
-        self.sphoto("--set-config shutterspeed=1/20")
-        self.sphoto("--set-config aperture=4")
-        self.sphoto("--set-config iso=400")
-        self.sphoto("--set-config imageformat=0")
-        """
-        #self.takePhoto()
+        self.status = 0
         
 
     def getControl(self, camera_index=0):
@@ -42,6 +34,8 @@ class CameraController:
             self.getConfig()
 
             self.displayLCD(self.active_camera.model)
+
+            self.status = 1
             
         except ValueError:
             self.displayLCD("Failed to get camera '{}'".format(camera_index))
@@ -109,6 +103,15 @@ class CameraController:
         return config
 
     def takePhoto(self):
+
+        """
+        self.sphoto("--set-config shutterspeed=1/20")
+        self.sphoto("--set-config aperture=4")
+        self.sphoto("--set-config iso=400")
+        self.sphoto("--set-config imageformat=0")
+        """
+
+
         taken = False
         while taken == False:
             self.sphoto("--capture-image-and-download")
