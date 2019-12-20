@@ -11,7 +11,7 @@ class Camera:
         self.usbid = "usb:{}".format(",".join(Usb))
 
     def __repr__(self):
-        return "<CAMERA-OBJECT: {}, {}>".format(self.model, self.usbid)
+        return "Camera[model={} usb={}]".format(self.model, self.usbid)
 
 class CameraController:
     def __init__(self):
@@ -38,7 +38,7 @@ class CameraController:
                 
 
             #Get cameras and config data
-            self.active_camera = self.cameras[cameraIndex]
+            self.active_camera = self.cameras[camera_index]
             self.getConfig()
 
             self.displayLCD(self.active_camera.model)
@@ -46,7 +46,7 @@ class CameraController:
         except ValueError:
             self.displayLCD("Failed to get camera '{}'".format(camera_index))
 
-        except (Exception as e):
+        except Exception as e:
             self.displayLCD("Unexpected Error", str(e))
 
 
@@ -131,7 +131,7 @@ class CameraController:
   
   
 	
-app = App()
+app = CameraController()
 #app.root.mainloop()
 
 """
