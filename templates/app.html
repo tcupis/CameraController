@@ -1,0 +1,109 @@
+{% extends "layout.html" %} {% block content %}
+
+<div class="container">
+    <h1 style="text-align: center;">Flat F</h1>
+    <hr>
+    <h3>This week</h3>
+    <br>
+    <h6>Jobs for Week #{{ week }}</h6>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Job</th>
+                <th>Person</th>
+            </tr>
+        </thead>
+        {% for job in jobs[week] %}
+        <tr>
+            <td>{{ job[0] }}</td>
+            <td>{{ job[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <h6>Weather man</h6>
+    <a class="weatherwidget-io" href="https://forecast7.com/en/50d94n1d40/so16-3uf/" data-label_1="SOUTHAMPTON" data-theme="pure">SOUTHAMPTON</a>
+    <script>
+        ! function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (!d.getElementById(id)) {
+                js = d.createElement(s);
+                js.id = id;
+                js.src = 'https://weatherwidget.io/js/widget.min.js';
+                fjs.parentNode.insertBefore(js, fjs);
+            }
+        }(document, 'script', 'weatherwidget-io-js');
+    </script>
+
+    <hr>
+
+    <h3>History</h3>
+    <br>
+    <div class="accordion" id="weekHistory">
+        {% for w in jobs|reverse %}
+        <div class="card">
+            <div class="card-header" id="heading{{ w }}">
+                <h2 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ w }}" aria-expanded="true" aria-controls="collapse{{ w }}">
+            Week #{{ w }}
+          </button>
+                </h2>
+            </div>
+
+            <div id="collapse{{ w }}" class="collapse collapsed" aria-labelledby="heading{{ w }}" data-parent="#weekHistory">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Job</th>
+                                <th>Person</th>
+                            </tr>
+                        </thead>
+                        {% for job in jobs[w] %}
+                        <tr>
+                            <td>{{ job[0] }}</td>
+                            <td>{{ job[1] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h3>Task distribution</h3>
+    <br>
+    <div class="card">
+        <div class="card-header" id="headingPeople">
+            <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapsePeople" aria-expanded="true" aria-controls="collapsePeople">
+                    Task distribution
+          </button>
+            </h2>
+        </div>
+
+        <div id="collapsePeople" class="collapse collapsed" aria-labelledby="headingPeople" data-parent="#weekHistory">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Person</th>
+                            <th>Total jobs</th>
+                        </tr>
+                    </thead>
+                    {% for person in points %}
+                    <tr>
+                        <td>{{ person }}</td>
+                        <td>{{ points[person] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}
