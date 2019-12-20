@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, url_for, redirect
-from forms import LoginForm
 import random
 import json
 import datetime
