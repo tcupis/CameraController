@@ -43,7 +43,9 @@ class CameraController:
         except Exception as e:
             self.displayLCD("Unexpected Error", str(e))
 
-
+    def getStatus(self):
+        return self.status
+        
     def displayLCD(self, line1, line2="", scrollingEnabled=True):
         self.LCD.lcd_clear()
         self.LCD.backlight(0)
