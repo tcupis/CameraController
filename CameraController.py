@@ -44,8 +44,9 @@ class CameraController:
         self.status = 0
         self.camera_index = 0
 
-
+        thr.start_new_thread(self.displayThread, ())
         thr.start_new_thread(self.controlThread, ())
+        
 
 
         
