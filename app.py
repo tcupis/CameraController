@@ -1,12 +1,10 @@
-from flask import Flask, render_template, request, url_for, redirect
-import random
 import json
-import datetime
-import secrets
+
+from flask import Flask, redirect, render_template, request, url_for
+
 import CameraController as cc
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = secrets.token_hex(24)
 
 camera = cc.CameraController()
 

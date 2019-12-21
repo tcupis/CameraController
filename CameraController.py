@@ -1,8 +1,17 @@
+import os
+import signal
+import subprocess
 import time
 from datetime import datetime
-import signal, os, subprocess
 from pprint import pprint
-import lcd
+import _thread as thr
+
+try:
+    import lcd
+    lcd_active = True
+except ImportError:
+    lcd_active = False
+
 
 class Camera:
     def __init__(self, Model, Usb):
@@ -10,47 +19,70 @@ class Camera:
         self.usb = Usb
         self.usbid = "usb:{}".format(",".join(Usb))
 
+        self.config = {}
+    
     def __repr__(self):
         return "Camera[model={} usb={}]".format(self.model, self.usbid)
+
+    def setConfig(self, config):
+        self.config = config
 
 class CameraController:
     def __init__(self):
         #Intialise LCD and kill gphoto2
-        self.LCD = lcd.lcd()
-        self.killGphoto2Process()
+        if lcd_active:
+            self.LCD = lcd.lcd()
 
-        self.status = 0
-        
-
-    def getControl(self, camera_index=0):
         try:
-            self.cameras = self.getCameras()
-            if len(self.cameras) < camera_index:
-                raise ValueError
+            self.killGphoto2Process()
+        except:
+            print("Linux support only!")
+            exit()
+
+        self.running = True
+        self.status = 0
+        self.camera_index = 0
+
+
+        thr.start_new_thread(self.controlThread, ())
+
+
+        
+    def controlThread(self):
+        while self.running:
+            try:
+                self.status = 0
+
+                self.cameras = self.getCameras()
+                if len(self.cameras) < self.camera_index:
+                    raise ValueError
+                    
+                self.active_camera = self.cameras[self.camera_index]
+                self.active_camera.setConfig(self.getConfig())
+
+                self.status = 1
+
+                self.displayLCD(self.active_camera.model, "Connected!")
                 
+            except ValueError:
+                self.displayLCD("Error", "No camera found!")
+                time.sleep(30)
 
-            #Get cameras and config data
-            self.active_camera = self.cameras[camera_index]
-            self.getConfig()
+            except Exception as e:
+                self.displayLCD("Unexpected Error", str(e))
+                time.sleep(60)
 
-            self.displayLCD(self.active_camera.model)
+            time.sleep(5)
 
-            self.status = 1
-            
-        except ValueError:
-            self.displayLCD("Failed to get camera '{}'".format(camera_index))
-
-        except Exception as e:
-            self.displayLCD("Unexpected Error", str(e))
 
     def getStatus(self):
         return self.status
-        
-    def displayLCD(self, line1, line2="", scrollingEnabled=True):
-        self.LCD.lcd_clear()
-        self.LCD.backlight(0)
-        self.LCD.lcd_display_string(self.active_camera.model)
 
+    def displayLCD(self, line1, line2="", scrollingEnabled=True):
+        if lcd_active:
+            self.LCD.lcd_clear()
+            self.LCD.backlight(0)
+            self.LCD.lcd_display_string(line1)
 
     def killGphoto2Process(self):
         #Get and kill all gphoto instances
