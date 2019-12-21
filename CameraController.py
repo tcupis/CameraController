@@ -12,6 +12,7 @@ try:
 except ImportError:
     lcd_active = False
 
+LCD_WIDTH = 16
 
 class Camera:
     def __init__(self, Model, Usb):
@@ -39,7 +40,7 @@ class CameraController:
             print("Linux support only!")
             exit()
 
-        self.running = True
+        self.running = False
         self.status = 0
         self.camera_index = 0
 
@@ -79,10 +80,21 @@ class CameraController:
         return self.status
 
     def displayLCD(self, line1, line2="", scrollingEnabled=True):
+        self.lcd_display = [str(line1), str(line2)]
+        self.lcd_scrollingEnabled = scrollingEnabled
+
+    def displayThread(self):
+        ptrs = [0, 0]
         if lcd_active:
             self.LCD.lcd_clear()
             self.LCD.backlight(0)
-            self.LCD.lcd_display_string(line1)
+
+            lines = self.lcd_display
+            for y in range(2):
+                self.LCD.lcd_display_string(str(lines[y]+" "*LCD_WIDTH)[ptrs[y]:ptrs[y]+LCD_WIDTH], y)
+                ptrs[y] += 1
+                if ptrs[y] >= len(lines[y]) + 16:
+                    ptrs[y] = 0
 
     def killGphoto2Process(self):
         #Get and kill all gphoto instances
@@ -111,7 +123,7 @@ class CameraController:
     def getConfig(self):
         start = time.time()
         config = {}
-        #rint(self.gphoto("--list-all-config"))
+        #print(self.gphoto("--list-all-config"))
         for setting in self.gphoto("--list-all-config")[1:].split("\n/"):
             setting = "".join(setting).split("\n")
 
